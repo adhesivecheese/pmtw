@@ -24,6 +24,7 @@ class Note(object):
 	def __repr__(self):
 		return f"Note(user='{self.user}', note='{self.note}', time='{self.time}')"
 
+
 # Usernotes represents the usernotes wiki page 
 class Usernotes(object):
 	"""
@@ -100,6 +101,7 @@ class Usernotes(object):
 		if len(parts) > 2: return f'https://reddit.com/r/{self.subreddit}/comments/{parts[1]}/-/{parts[2]}'
 		elif len(parts) > 1: return f'https://reddit.com/{parts[1]}'
 		else: return link #modmail links are stored as full links
+
 
 	"""Private method to compress links into toolbox versions"""
 	def __compress_link(self, link):
