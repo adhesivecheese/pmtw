@@ -7,7 +7,7 @@ import copy
 import time as t
 from prawcore.exceptions import NotFound
 from pmtw.decorators import batch, localdata
-from .constants import usernotes_schema, usernotes_page, zlib_compression_strength, max_wiki_size
+from pmtw.constants import usernotes_schema, usernotes_page, zlib_compression_strength, max_wiki_size
 
 
 # Note represents an individual usernote
