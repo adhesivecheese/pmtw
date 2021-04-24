@@ -204,6 +204,7 @@ class Usernotes(object):
 		except:
 			raise ValueError(f"{note.warning} is not a valid warning kind.")
 		if note.link: link = self.__compress_link(note.link)
+		else: link = None
 		new_note = {
 			't': note.time, 'n': note.note, 'm': mod_index,
 			'w': warning_index, 'l': link
