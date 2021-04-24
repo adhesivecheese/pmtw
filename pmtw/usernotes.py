@@ -25,7 +25,7 @@ class Note(object):
 		return f"Note(user='{self.user}', note='{self.note}', time='{self.time}')"
 
 
-# Usernotes represents the usernotes wiki page 
+# Usernotes represents the usernotes wiki page
 class Usernotes(object):
 	"""
 		Construtor for the Usernotes class. Arguments:
@@ -118,10 +118,12 @@ class Usernotes(object):
 	"""Method to push usernotes back to Reddit"""
 	def push_usernotes(self, reason='"Batch usernote update" via pmtw', truncate=False):
 		wikipage_data = json.dumps(self.__compress_json(self.usernotesJSON))
-		if len(wikipage_data) > max_wiki_size:
+		usernotes_max_wiki_size = max_wiki_size * 2
+		if len(wikipage_data) > usernotes_max_wiki_size:
 			#TODO: if truncate is true, truncate oldest usernotes to fit if too big
-			raise OverflowError(f'Usernote data {len(wikipage_data) - max_wiki_size} bytes too big to insert')
-		self.subreddit.wiki[usernotes_page].edit(wikipage_data, reason)
+			raise OverflowError(f'Usernote data {len(wikipage_data) - usernotes_max_wiki_size} bytes too big to insert')
+		try: self.subreddit.wiki[usernotes_page].edit(wikipage_data, reason)
+		except: self.r.request("POST", path=f"/r/{self.subreddit}/api/wiki/edit", data={"content": wikipage_data, "page":"usernotes", "reason":reason})
 		return
 
 
