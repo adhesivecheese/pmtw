@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
   name = 'pmtw',
   packages = ['pmtw'],
-  version = '0.1.4',
+  version = '0.2.1',
   license='GPL-3',
   description = 'Python Moderator Toolbox Wrapper for reddit',
   long_description = open('README').read(),
