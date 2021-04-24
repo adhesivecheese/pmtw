@@ -177,8 +177,7 @@ class Settings(object):
 		removalReasons = []
 		try:
 			item = self.settingsJSON['removalReasons']
-			removalReasons.append(
-				removalReason(
+			removalReasons = removalReason(
 					pmsubject       = item['pmsubject']                  if 'pmsubject'       in item.keys() else None,
 					logreason       = item['logreason']                  if 'logreason'       in item.keys() else None,
 					header          = self.__decode_text(item['header']) if 'header'          in item.keys() else None,
@@ -196,7 +195,6 @@ class Settings(object):
 					getfrom         = item['getfrom']                    if 'getfrom'         in item.keys() else None,
 					reasons         = self.get_reasons()
 				)
-			)
 		except KeyError: raise KeyError("Section ['removalReasons'] does not seem to exist in settings")
 		return removalReasons
 
