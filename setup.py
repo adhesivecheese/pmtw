@@ -1,17 +1,19 @@
 from distutils.core import setup
+
 setup(
-  name = 'PMTW',
-  packages = ['PMTW'],
-  version = '0.1',
+  name = 'pmtw',
+  packages = ['pmtw'],
+  version = '0.1.4',
   license='GPL-3',
   description = 'Python Moderator Toolbox Wrapper for reddit',
+  long_description = open('README').read(),
   author = 'AdhesiveCheese',
   author_email = 'adhesiveCheese@gmail.com',
   url = 'https://github.com/adhesivecheese/pmtw',
   download_url = 'https://github.com/adhesivecheese/pmtw/archive/refs/tags/V0_1.tar.gz',
   keywords = ['Reddit', 'Moderator_Toolbox', 'Web Wrapper'],
   install_requires=[
-          'praw',
+          'praw >=6.0',
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',
