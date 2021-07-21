@@ -231,10 +231,8 @@ class Usernotes(object):
 				break
 		# Delete the user from the database if there are no notes left
 		if len(notes_on_user) == 0:
-			#respect batch mode
-			if batch == True: self.purge_user_notes(username, immediate=True)
-			else: self.purge_user_notes(username)
-			return
+			del self.usernotesJSON['users'][username]
+			return f"\"delete all notes on user '{username}'\" via pmtw"
 		else:
 			#multiplication of timestamp is for consistency with toolbox display
 			return f"\"delete note {timestamp*10000} on user '{username}'\" via pmtw"
@@ -246,7 +244,6 @@ class Usernotes(object):
 	if so, you will manually need to manually sync notes with push_usernotes()
 	"""
 	@batch
-	def purge_user_notes(self, username, immediate=False):
+	def purge_user_notes(self, username):
 		del self.usernotesJSON['users'][username]
-		if immediate == True: self.push_usernotes(f"\"delete all notes on user '{username}'\" via pmtw")
 		return f"\"delete all notes on user '{username}'\" via pmtw"
