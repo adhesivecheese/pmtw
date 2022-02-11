@@ -201,8 +201,7 @@ class Usernotes(object):
     def existing_users(self):
         """
         Returns list of usernames that have notes.
-        Use existing_users(local="False") to fetch notes before
-        returning list of users
+        Use existing_users(local="False") to fetch notes before returning list of users
         """
         return list(self.usernotesJSON['users'].keys())
 
@@ -210,8 +209,7 @@ class Usernotes(object):
     def add_note(self, note):
         """
         Add a note to a user on Reddit. Accepts a Note object
-        By default, immediately adds to wiki page. You can override
-        immediate insertion by passing add_note(note, batch="True");
+        By default, immediately adds to wiki page. You can override immediate insertion by passing add_note(note, batch="True");
         if so, you will need to manually sync notes with push_usernotes()
         """
         notes = self.usernotesJSON
