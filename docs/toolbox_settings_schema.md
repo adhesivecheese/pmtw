@@ -7,10 +7,14 @@ Moderator Toolbox stores settings at `https://reddit.com/r/{sub}/wiki/toolbox`,
 where `{sub}` is the name of a subreddit. The wiki is stored as a plain JSON object
 with the following properties (indicated as python types after loading the JSON):
 
+## ver
+
 ver [Integer]
 : The Settings format version. The current version of the settings page is `1`.
 Increases in the version number indicate breaking changes to this schema; a
 lower version of this schema should *never* be written back to the wiki.
+
+## domainTags
 
 domainTags [Empty String] or [Dictionary]
 : Initially an empty string, if filled out becomes a dictionary object
@@ -22,6 +26,8 @@ keys
 	color [String]
 	: The color for the tag, in CSS 6-character hex format with a leading `#`.
 	(e.g. `"#0094FF"`)
+
+## removalReasons
 
 removalReasons [Empty String] or [Dictionary]
 : Initially an empty string, if filled out becomes a dictionary object
@@ -80,33 +86,35 @@ removalReasons [Empty String] or [Dictionary]
 	settings.
 
 	reasons [List]
-	: reasons is a list of dictionary objects. Each reason has the following
-	attributes
+	: reasons is a list of dictionary objects, defined in the next section
 
-		text [HTML encoded or unquoted String]
-		: Text content of the removal reason. Accepts placeholders, as well as 
-		a subset of HTML which needs to be documented. TODO
+## reasons
 
-		flairText [HTML encoded String]
-		: Flair text to be applied to posts this reason is used on. Empty 
-		string for none.
+text [HTML encoded or unquoted String]
+: Text content of the removal reason. Accepts placeholders, as well as 
+a subset of HTML which needs to be documented. TODO
 
-		flairCSS [HTML encoded String]
-		: Flair CSS class to be applied to posts this reason is used on. Empty 
-		string for none.
+flairText [HTML encoded String]
+: Flair text to be applied to posts this reason is used on. Empty 
+string for none.
 
-		removePosts [Boolean]
-		: If `True`, the removal reason is applicable to submissions.
+flairCSS [HTML encoded String]
+: Flair CSS class to be applied to posts this reason is used on. Empty 
+string for none.
 
-		removeComments [Boolean]
-		: If `True`, the removal reason is applicable to comments
+removePosts [Boolean]
+: If `True`, the removal reason is applicable to submissions.
 
-		title [HTML encoded String]
-		: Title of the removal reason.
+removeComments [Boolean]
+: If `True`, the removal reason is applicable to comments
 
-		flairTemplateID
-		: The id of a flair template to apply.
+title [HTML encoded String]
+: Title of the removal reason.
 
+flairTemplateID [String]
+: The id of a flair template to apply.
+
+## modMacros
 
 modMacros [Empty String] or [List]
 : Initially an empty string, if filled out becomes a list
@@ -159,6 +167,8 @@ modMacros [Empty String] or [List]
 	contextmodmail [Boolean]
 	: If `True`, macro is available for new modmail messages
 
+## usernoteColors
+
 usernoteColors [List]
 : A list of dictionaries containing three keys
 
@@ -173,6 +183,7 @@ usernoteColors [List]
 	color [String]
 	: Any valid CSS color string. The color associated with this note type.
 
+## banMacros
 
 banMacros [Empty String] or [Dictionary]
 : Initially an empty string, if filled out becomes a dictionary object
