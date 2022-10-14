@@ -1,0 +1,20 @@
+site_name: pmtw
+theme:
+    name: readthedocs
+nav:
+    - Getting Started:
+        - Quick Start: quick_start.md
+        - Installing PMTW: installing.md
+    - 'Code Overview':
+        - The Toolbox Instance: toolbox_instance.md
+        - ToolboxUsernotes: ToolboxUsernotes.md
+        - ToolboxSettings: ToolboxSettings.md
+        - ToolboxNote: ToolboxNote.md
+        - Other Classes: other_classes.md
+
+
+markdown_extensions:
+  - def_list
+  - admonition
+  - toc:
+      permalink: 
