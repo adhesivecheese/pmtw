@@ -37,17 +37,17 @@ PRAW `subreddit()` object.
 
 # Tutorials
 
-* [Live Comment Pruner]()
+* [Basic workflow](tutorials_basics.md)
+* [Live Usernote Pruner](tutorials_liveprune.md)
 
 # Package Info
 
 * [Change Log](changelog.md)
 * [Contributing](contributing.md)
-* [Migrating to PMTW 1.X](migrating_to_1x.md)
+* [Migrating to PMTW 1.x](migrating_to_1x.md)
 * [References](references.md)
 
 # Toolbox Schema Information
 
-* [Usernotes]()
-* [Note]()
+* [Usernotes](toolbox_usernote_schema.md)
 * [Settings]()
