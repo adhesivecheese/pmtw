@@ -4,8 +4,6 @@ import urllib.parse
 from pmtw.usernotes import ToolboxNote, ToolboxUsernotes
 from pmtw.toolbox import Toolbox
 
-from pmtw.constants import DEFAULT_IDENTIFIER
-
 """
 Wrappers to provide drop-in functionality for users coming from pmtw version 0.2.1
 """

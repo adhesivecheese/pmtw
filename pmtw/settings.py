@@ -28,6 +28,7 @@ class BanMacros:
 		_banMessage = str(obj.get("banMessage"))
 		return BanMacros(_banNote, _banMessage)
 
+
 @dataclass
 class DomainTag:
 	name: str
@@ -38,6 +39,7 @@ class DomainTag:
 		_name = str(obj.get("name"))
 		_color = str(obj.get("color"))
 		return DomainTag(_name, _color)
+
 
 @dataclass
 class ModMacro:
@@ -96,6 +98,7 @@ class ModMacro:
 		_contextmodmail = bool(obj.get("contextmodmail"))
 		return ModMacro(_text, _title, _distinguish, _ban, _mute, _remove, _approve, _lockthread, _lockreply, _sticky, _archivemodmail, _highlightmodmail, _contextpost, _contextcomment, _contextmodmail)
 
+
 @dataclass
 class Reason:
 	text: str
@@ -128,6 +131,7 @@ class Reason:
 		_title = str(obj.get("title"))
 		_flairTemplateID = str(obj.get("flairTemplateID"))
 		return Reason(_text, _flairText, _flairCSS, _removePosts, _removeComments, _title, _flairTemplateID)
+
 
 @dataclass
 class RemovalReasons:
@@ -192,6 +196,7 @@ class RemovalReasons:
 		_reasons = [Reason.from_dict(y) for y in obj.get("reasons")]
 		return RemovalReasons(_pmsubject, _logreason, _header, _footer, _removalOption, _typeReply, _typeStickied, _typeCommentAsSubreddit, _typeLockComment, _typeAsSub, _autoArchive, _typeLockThread, _logsub, _logtitle, _bantitle, _getfrom, _reasons)
 
+
 @dataclass
 class UsernoteColor:
 	key: str
@@ -204,6 +209,7 @@ class UsernoteColor:
 		_text = str(obj.get("text"))
 		_color = str(obj.get("color"))
 		return UsernoteColor(_key, _text, _color)
+
 
 @dataclass
 class SettingsRoot:
@@ -264,11 +270,9 @@ class ToolboxSettings:
 
 		if not lazy: self.load()
 
-
 	def __repr__(self):
 		"""Set display for a ToolboxSettings object"""
 		return f"ToolboxSettings(subreddit='{self.__subreddit}')"
-
 
 	def load(self):
 		"""
@@ -310,7 +314,6 @@ class ToolboxSettings:
 		self.warnings = warnings
 
 		return "Settings loaded"
-
 
 	def save(self, reason="Settings update"):
 		"""

@@ -21,25 +21,20 @@ class Toolbox:
 			string that get's appended to all wikiedit discriptions identifying
 			pmtw as the actioner. Defaults to "via pmtw"
 		"""
-
 		self.settings = ''
 		self.usernotes = ''
 		self.identifier = identifier
 		self.__subreddit = subreddit
-
 		if not lazy: self._load()
 			
-
 	def __repr__(self):
 		"""Set display for a Toolbox object"""
 		return f"Toolbox(subreddit='{self.__subreddit}')"
-
 
 	def _load(self):
 		"""Load settings and Usernotes"""
 		self.settings = ToolboxSettings(self.__subreddit, identifier=self.identifier)
 		self.usernotes = ToolboxUsernotes(self.__subreddit, identifier=self.identifier, settingsWarnings=self.settings.warnings)
-
 
 	def prune_notes(self, days=180, before=None, excludeKinds=[], dryRun=False):
 		"""
@@ -89,7 +84,6 @@ class Toolbox:
 			self.usernotes.save(f"bulk deleted {notes_count:,} notes on {users_count:,} users older than {days} days")
 			return f"bulk deleted {notes_count:,} notes on {users_count:,} users older than {days} days"
 
-
 	def search_notes(self, query, kind="note", range="after", lazy=True):
 		"""
 		Search usernotes. 
@@ -137,9 +131,7 @@ class Toolbox:
 			search = str(search)
 			search = search.lower()
 			if query.lower() in search: results.append(note)
-
 		return results
-
 
 	def export_notes(
 		self, 

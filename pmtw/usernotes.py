@@ -142,19 +142,15 @@ class ToolboxUsernotes:
 		self.__usernotesJSON = {}
 		self.__settingsWarnings = settingsWarnings
 
-		if not lazy:
-			self.load()
-
+		if not lazy: self.load()
 
 	def __str__(self):
 		"""return the uncompessed json from the usernotes page as a string"""
 		return str(self.__usernotesJSON)
 
-
 	def __repr__(self):
 		"""Set display for a ToolboxUsernotes object"""
 		return f"ToolboxUsernotes(subreddit='{self.__subreddit}')"
-
 
 	def __expand_json(self, notes):
 		"""
@@ -177,7 +173,6 @@ class ToolboxUsernotes:
 		notes['users'] = json.loads(json_blob) # add decoded users section to json dictionary
 		self.__usernotesJSON = notes
 		return notes
-
 
 	def __compress_json(self, notes=None):
 		"""
@@ -204,7 +199,6 @@ class ToolboxUsernotes:
 		compressed_json['blob'] = blob #insert the blob back into the json
 		return json.dumps(compressed_json)
 
-
 	def __get_warnings(self):
 		""""
 		Private method. Gets warnings from the usernotes json, and appends
@@ -216,7 +210,6 @@ class ToolboxUsernotes:
 			if usernoteColor not in self.warnings:
 				self.warnings.append(usernoteColor)
 		
-
 	def __get_mod_index(self, mod):
 		"""
 		Private method. Toolbox stores the moderator as an index for a given 
@@ -240,7 +233,6 @@ class ToolboxUsernotes:
 		except ValueError:
 			self.__usernotesJSON['constants']['users'].append(mod)
 			return self.__usernotesJSON['constants']['users'].index(mod)
-
 
 	def __get_warning_index(self, warning):
 		"""
@@ -276,7 +268,6 @@ class ToolboxUsernotes:
 			else:
 				raise ValueError(f"{warning} is not a valid warning.")
 
-
 	def __match_username(self, username):
 		"""
 		Try to match a user with notes and get the proper capitalization for key
@@ -289,7 +280,6 @@ class ToolboxUsernotes:
 		if search_user == "":
 			search_user = username
 		return search_user
-
 
 	def _save(self, reason='Usernote update'):
 		"""
@@ -317,7 +307,6 @@ class ToolboxUsernotes:
 			raise OverflowError(f'Usernote data {len(wikipage_data) - MAX_WIKI_SIZE} bytes too big to insert')
 		self.__subreddit.wiki[USERNOTES_PAGE].edit(content=wikipage_data, reason=reason)
 		return reason
-
 
 	def load(self):
 		"""
@@ -349,7 +338,6 @@ class ToolboxUsernotes:
 			self.__expand_json(notes)
 			self.__get_warnings()
 		return "Usernotes loaded"
-
 
 	def add(self, note, lazy=False):
 		"""
@@ -399,7 +387,6 @@ class ToolboxUsernotes:
 			if lazy == False:
 				self._save(f"create new note on user '{user}'")
 				return f"create new note on user '{user}'"
-
 
 	def remove(self, user, timestamp=-1, lazy=False):
 		"""
@@ -454,7 +441,6 @@ class ToolboxUsernotes:
 				if lazy == False: self._save(f"delete note {timestamp} on user '{user}'")
 				return f"delete note {timestamp} on user '{user}'"
 
-	
 	def list_users(self, lazy=True):
 		"""
 		Returns a list of all users with notes. If fresh is set to True, will 
@@ -472,7 +458,6 @@ class ToolboxUsernotes:
 		"""
 		if lazy == True: self.load()
 		return list(self.__usernotesJSON['users'].keys())
-
 
 	def list_notes(self, user, lazy=True, reverse=False):
 		"""
@@ -519,7 +504,6 @@ class ToolboxUsernotes:
 			users_notes = sorted(users_notes, key = lambda x: x.time, reverse=reverse)
 			return users_notes
 		except KeyError: return []
-
 
 	def list_all_notes(self, lazy=True, reverse=False):
 		"""
