@@ -221,7 +221,7 @@ class SettingsRoot:
 		return self.to_json()
 
 	def to_json(self):
-		return json.dumps(self.__dict__, default=lambda o: o.__dict__)
+		return json.dumps(self.__dict__, cls=JSONEncoder)
 
 	@staticmethod
 	def from_dict(obj: Any) -> 'SettingsRoot':
