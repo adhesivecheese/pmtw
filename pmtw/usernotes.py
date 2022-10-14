@@ -79,7 +79,7 @@ class ToolboxNote:
 		if link == '': return None #if no link, nothing to do
 		parts = link.split(',') # 'l,abcde,fghij' format for comments, 'l,kmlno' for links
 		if parts[0] == "m": return f'https://reddit.com/message/messages/{parts[1]}'
-		if len(parts) > 2: return f'https://reddit.com/{parts[1]}/-/{parts[2]}'
+		if len(parts) > 2: return f'https://reddit.com/comments/{parts[1]}/-/{parts[2]}'
 		elif len(parts) > 1: return f'https://reddit.com/{parts[1]}'
 		else: return link #modmail links are stored as full links
 
@@ -211,7 +211,7 @@ class ToolboxUsernotes:
 		other available warnings passed to the constructor
 		"""
 		self.warnings = self.__usernotesJSON['constants']['warnings'].copy()
-		if "None" not in self.warnings: self.warnings.append("None")
+		if None not in self.warnings: self.warnings.append(None)
 		for usernoteColor in self.__settingsWarnings:
 			if usernoteColor not in self.warnings:
 				self.warnings.append(usernoteColor)
@@ -384,8 +384,9 @@ class ToolboxUsernotes:
 		if new_note['w'] not in self.warnings:
 				raise ValueError(f"{new_note['w']} is not a valid warning type")
 
-		new_note['m'] = self.__get_mod_index(new_note['m']) 
-		new_note['w'] = self.__get_warning_index(new_note['w'])
+		new_note['m'] = self.__get_mod_index(new_note['m'])
+		if new_note['w'] == 'None': new_note['w'] = self.__get_warning_index(None)
+		else: new_note['w'] = self.__get_warning_index(new_note['w'])
 
 		user = self.__match_username(note.user)
 		try:
