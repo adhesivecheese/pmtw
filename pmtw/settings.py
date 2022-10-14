@@ -60,7 +60,7 @@ class ModMacro:
 	def to_dict(ModMacro):
 		d = {
 			"text":urllib.parse.quote(ModMacro.text),
-			"title": str(ModMacro.title),
+			"title": ModMacro.title,
 			"distinguish": ModMacro.distinguish,
 			"ban": ModMacro.ban,
 			"mute": ModMacro.mute,
@@ -151,8 +151,8 @@ class RemovalReasons:
 
 	def to_dict(RemovalReasons):
 		d = {
-		"pmsubject": RemovalReasons.pmsubject,
-		"logreason": RemovalReasons.logreason,
+		"pmsubject": urllib.parse.quote(RemovalReasons.pmsubject),
+		"logreason": urllib.parse.quote(RemovalReasons.logreason),
 		"header": urllib.parse.quote(RemovalReasons.header),
 		"footer": urllib.parse.quote(RemovalReasons.footer),
 		"removalOption": RemovalReasons.removalOption,
@@ -163,9 +163,9 @@ class RemovalReasons:
 		"typeAsSub": RemovalReasons.typeAsSub,
 		"autoArchive": RemovalReasons.autoArchive,
 		"typeLockThread": RemovalReasons.typeLockThread,
-		"logsub": RemovalReasons.logsub,
+		"logsub": urllib.parse.quote(RemovalReasons.logsub),
 		"logtitle":RemovalReasons.logtitle,
-		"bantitle": RemovalReasons.bantitle,
+		"bantitle": urllib.parse.quote(RemovalReasons.bantitle),
 		"getfrom": RemovalReasons.getfrom,
 		"reasons":[Reason.to_dict(r) for r in RemovalReasons.reasons]
 		}
@@ -173,8 +173,8 @@ class RemovalReasons:
 
 	@staticmethod
 	def from_dict(obj: Any) -> 'RemovalReasons':
-		_pmsubject = str(obj.get("pmsubject"))
-		_logreason = str(obj.get("logreason"))
+		_pmsubject = urllib.parse.unquote(str(obj.get("pmsubject")))
+		_logreason = urllib.parse.unquote(str(obj.get("logreason")))
 		_header = urllib.parse.unquote(str(obj.get("header")))
 		_footer = urllib.parse.unquote(str(obj.get("footer")))
 		_removalOption = str(obj.get("removalOption"))
@@ -185,9 +185,9 @@ class RemovalReasons:
 		_typeAsSub = bool(obj.get("typeAsSub"))
 		_autoArchive = bool(obj.get("autoArchive"))
 		_typeLockThread = bool(obj.get("typeLockThread"))
-		_logsub = str(obj.get("logsub"))
+		_logsub = urllib.parse.unquote(str(obj.get("logsub")))
 		_logtitle = str(obj.get("logtitle"))
-		_bantitle = str(obj.get("bantitle"))
+		_bantitle = urllib.parse.unquote(str(obj.get("bantitle")))
 		_getfrom = str(obj.get("getfrom"))
 		_reasons = [Reason.from_dict(y) for y in obj.get("reasons")]
 		return RemovalReasons(_pmsubject, _logreason, _header, _footer, _removalOption, _typeReply, _typeStickied, _typeCommentAsSubreddit, _typeLockComment, _typeAsSub, _autoArchive, _typeLockThread, _logsub, _logtitle, _bantitle, _getfrom, _reasons)
@@ -285,7 +285,7 @@ class ToolboxSettings:
 			page = json.loads(page)
 			if page["ver"] != 1: raise ValueError(f"pmtw requires settings ver {SETTINGS_VERSION}, got {page['ver']}")
 		except NotFound:
-			initialJSON = {"ver":1,"domainTags":"","removalReasons":"","modMacros":"","usernoteColors":[{"key":"gooduser","text":"Good Contributor","color":"#008000"},{"key":"spamwatch","text":"Spam Watch","color":"#ff00ff"},{"key":"spamwarn","text":"Spam Warning","color":"#800080"},{"key":"abusewarn","text":"Abuse Warning","color":"#ffa500"},{"key":"ban","text":"Ban","color":"#ff0000"},{"key":"permban","text":"Permanent Ban","color":"#8b0000"},{"key":"botban","text":"Bot Ban","color":"#000000"}],"banMacros":""}
+			initialJSON = {"ver":1,"domainTags":"","removalReasons":{"pmsubject":"","logreason":"","header":"test","footer":"","removalOption":"suggest","typeReply":"reply","typeStickied":False,"typeCommentAsSubreddit":False,"typeLockComment":False,"typeAsSub":False,"autoArchive":False,"typeLockThread":False,"logsub":"","logtitle":"","bantitle":"","getfrom":"","reasons":[]},"modMacros":[],"usernoteColors":[{"key":"gooduser","text":"Good Contributor","color":"#008000"},{"key":"spamwatch","text":"Spam Watch","color":"#ff00ff"},{"key":"spamwarn","text":"Spam Warning","color":"#800080"},{"key":"abusewarn","text":"Abuse Warning","color":"#ffa500"},{"key":"ban","text":"Ban","color":"#ff0000"},{"key":"permban","text":"Permanent Ban","color":"#8b0000"},{"key":"botban","text":"Bot Ban","color":"#000000"}],"banMacros":{"banNote":"","banMessage":""}}
 			page = self.__subreddit.wiki.create(name=SETTINGS_PAGE, content=str(initialJSON))
 			self.__subreddit.wiki[SETTINGS_PAGE].mod.update(listed=False, permlevel=2)
 
