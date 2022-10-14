@@ -1,6 +1,6 @@
 # Toolbox Usernotes Wiki Page
 
-Unofficial documentation. Canonnical documentation may be found 
+Unofficial documentation. Canonnical documentation may be found
 [here](https://github.com/toolbox-team/reddit-moderator-toolbox/wiki/Subreddit-Wikis%3A-toolbox).
 
 Moderator Toolbox stores settings at `https://reddit.com/r/{sub}/wiki/toolbox`,
@@ -9,7 +9,7 @@ with the following properties (indicated as python types after loading the JSON)
 
 ver [Integer]
 : The Settings format version. The current version of the settings page is `1`.
-Increases in the version number indicate breaking changes to this schema; a 
+Increases in the version number indicate breaking changes to this schema; a
 lower version of this schema should *never* be written back to the wiki.
 
 domainTags [Empty String] or [Dictionary]

@@ -1,35 +1,35 @@
 # Toolbox Usernotes Wiki Page
 
-Unofficial documentation. Canonnical documentation may be found 
+Unofficial documentation. Canonnical documentation may be found
 [here](https://github.com/toolbox-team/reddit-moderator-toolbox/wiki/Subreddit-Wikis%3A-usernotes).
 
 Moderator Toolbox stores usernotes at `https://reddit.com/r/{sub}/wiki/usernotes`,
 where `{sub}` is the name of a subreddit. The wiki is stored as a plain JSON object
 with the following properties (indicated as python types after loading the JSON):
 
-ver \[Integer\]
+ver [Integer]
 : The Usernotes format version. The current version of the usernotes page is `6`.
-Increases in the version number indicate breaking changes to this schema; a 
+Increases in the version number indicate breaking changes to this schema; a
 lower version of this schema should *never* be written back to the wiki.
 
-constants \[Dictionary\]
+constants [Dictionary]
 : A misnomer, as data in this section is entirely mutable; the only thing which
 should remain constant is the order of existing values in each respective list.
-: users \[List\]
+: users [List]
 	: a misnomer - this is a list of *moderator* usernames (without the leading
 	 "/u/", e.g. "adhesiveCheese") who have left notes for users, not users with
 	 notes as the name might lead you to believe. Each individual note maps the
 	 `m` key as an index of this array; as such, you cannot modify the order of
 	 or remove members from this list without updating every single usernote. 
 	 New entries in this list should always be added to the end of the list.
-: warnings \[List\]
+: warnings [List]
 	: a list of note type names as strings. just like with the `users` list, you
 	cannot modify the order of or remove items from this list without updating 
 	every single usernote. These strings correspond to the `key` item for each 
 	dictionary in the `usernoteColors` in the Toolbox settings schema. Only 
 	warning types which appear in at least one note exist in this list, even if 
 	additional note types are configured in settings.
-: blob \[String\]
+: blob [String]
 	A zlib-compressed, base64-encoded string that, when decoded and 
 	decompressed, gives a JSON object containing all usernotes. For working with
 	notes, this blob is decompressed and replaced with `users`, which is 
@@ -79,22 +79,22 @@ It is important to keep in mind that JSON keys are case-sensitive;
 
 A note is a dictionary.
 
-t \[Integer\]
+t [Integer]
 : The unix timestamp of the notes creation; the number of seconds sinc the 
 epoch (1970-01-01 00:00 UTC).
 
-n \[String\]
+n [String]
 : The text of the usernote.
 
-m \[integer\]
+m [integer]
 : The index of the moderator who added the note; index starts at 0. Determined 
 from the `users` section in `constants`.
 
-w \[integer\]
+w [integer]
 : The index of the warning key; index starts at 0. Determined from the 
 `warnings` section in `constants`.
 
-l \[String\] (lower-case L, not 1 or capital i)
+l [String] (lower-case L, not 1 or capital i)
 : This key may not exist on all notes. A string representing a link to where 
 the note was added from. Toolbox compresses Submission, Comment, and old modmail
 links, so you should not assume this link is a valid URL. Link string formats
