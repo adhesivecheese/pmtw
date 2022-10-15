@@ -14,7 +14,6 @@ nav:
     - Package Info:
         - Changelog: changelog.md
         - Contributing: contributing.md
-        - Migrating to PMTW 1.x: migrating_to_1x.md
         - References: references.md
     - Toolbox Schema Info:
         - Usernotes: toolbox_usernote_schema.md
