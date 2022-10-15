@@ -11,9 +11,6 @@ nav:
         - ToolboxSettings: ToolboxSettings.md
         - ToolboxNote: ToolboxNote.md
         - Other Classes: other_classes.md
-    - Tutorials:
-        - Basic workflow: tutorials_basics.md
-        - Live Usernote Pruner: tutorials_liveprune.md
     - Package Info:
         - Changelog: changelog.md
         - Contributing: contributing.md
