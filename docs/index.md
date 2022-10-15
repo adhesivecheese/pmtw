@@ -35,19 +35,13 @@ PRAW `subreddit()` object.
 * [ToolboxNote](ToolboxNote.md)
 * [Other Classes](other_classes.md)
 
-# Tutorials
-
-* [Basic workflow](tutorials_basics.md)
-* [Live Usernote Pruner](tutorials_liveprune.md)
-
 # Package Info
 
 * [Change Log](changelog.md)
 * [Contributing](contributing.md)
-* [Migrating to PMTW 1.x](migrating_to_1x.md)
 * [References](references.md)
 
 # Toolbox Schema Information
 
 * [Usernotes](toolbox_usernote_schema.md)
-* [Settings]()
+* [Settings](toolbox_settings_schema.md)
