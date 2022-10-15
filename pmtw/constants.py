@@ -1,7 +1,7 @@
-usernotes_schema = 6
-settings_schema  = 1
-usernotes_page   = "usernotes"
-settings_page    = "toolbox"
-max_wiki_size    = 524288 #Max Bytes for wiki page
-
-zlib_compression_strength = 9
+__version__ = "1.0.0"
+SETTINGS_VERSION = 1
+USERNOTES_VERSION = 6
+USERNOTES_PAGE = "usernotes"
+SETTINGS_PAGE = "toolbox"
+MAX_WIKI_SIZE = 1048576
+DEFAULT_IDENTIFIER = "via pmtw"

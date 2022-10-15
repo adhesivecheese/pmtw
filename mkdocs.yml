@@ -1,0 +1,30 @@
+site_name: pmtw
+theme:
+    name: readthedocs
+nav:
+    - Getting Started:
+        - Quick Start: quick_start.md
+        - Installing PMTW: installing.md
+    - 'Code Overview':
+        - The Toolbox Instance: toolbox_instance.md
+        - ToolboxUsernotes: ToolboxUsernotes.md
+        - ToolboxSettings: ToolboxSettings.md
+        - ToolboxNote: ToolboxNote.md
+        - Other Classes: other_classes.md
+    - Tutorials:
+        - Basic workflow: tutorials_basics.md
+        - Live Usernote Pruner: tutorials_liveprune.md
+    - Package Info:
+        - Changelog: changelog.md
+        - Contributing: contributing.md
+        - Migrating to PMTW 1.x: migrating_to_1x.md
+        - References: references.md
+    - Toolbox Schema Info:
+        - Usernotes: toolbox_usernote_schema.md
+        - Settings: toolbox_settings_schema.md
+
+markdown_extensions:
+  - def_list
+  - admonition
+  - toc:
+      permalink: 

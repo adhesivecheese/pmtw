@@ -1,25 +1,56 @@
-from distutils.core import setup
+#!/usr/bin/env python
+"""pmtw setup.py"""
+
+import setuptools
+
+if __name__ == "__main__":
+    setuptools.setup()
+
+"""
+from setuptools import setup
+from os import path
+import re
+from codecs import open
+
+PACKAGE_NAME = "pmtw"
+HERE = path.abspath(path.dirname(__file__))
+with open(path.join(HERE, "README.md"), encoding="utf-8") as fp:
+    README = fp.read()
+with open(path.join(HERE, PACKAGE_NAME, "constants.py"), encoding="utf-8") as fp:
+    VERSION = re.search('__version__ = "([^"]+)"', fp.read()).group(1)
 
 setup(
-  name = 'pmtw',
-  packages = ['pmtw'],
-  version = '0.2.1',
-  license='GPL-3',
-  description = 'Python Moderator Toolbox Wrapper for reddit',
-  long_description = open('README').read(),
-  author = 'AdhesiveCheese',
+  name = PACKAGE_NAME,
+  author = 'adhesiveCheese',
   author_email = 'adhesiveCheese@gmail.com',
-  url = 'https://github.com/adhesivecheese/pmtw',
-  download_url = 'https://github.com/adhesivecheese/pmtw/archive/refs/tags/V0_1.tar.gz',
-  keywords = ['Reddit', 'Moderator_Toolbox', 'Web Wrapper'],
-  install_requires=[
-          'praw >=6.0',
-      ],
+  python_requires="~=3.7",
   classifiers=[
-    'Development Status :: 3 - Alpha',
-    'Intended Audience :: Developers',
-    'Topic :: Utilities',
-    'License :: OSI Approved :: GNU General Public License (GPL)',
-    'Programming Language :: Python :: 3.6',
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Topic :: Utilities",
   ],
+  description = (
+        'PMTW, an acronym for "Python Moderator Toolbox Wrapper", is a python '
+        "package that allows for simple access to Moderator Toolbox"
+  ),
+  install_requires=[
+          'praw >=7.0',
+  ],
+  keywords = ['Reddit', 'Moderator_Toolbox', 'Web Wrapper'],
+  license="Simplified BSD License",
+  url = 'https://github.com/adhesivecheese/pmtw',
+  download_url = 'https://github.com/adhesivecheese/pmtw/archive/refs/tags/v1_0_0.tar.gz',
+  version = VERSION,
+  long_description = README,
+
 )
+"""

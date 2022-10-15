@@ -1,312 +1,351 @@
 import json
-import copy
 import urllib.parse
+from dataclasses import dataclass
+from typing import Any, List
+
 from prawcore.exceptions import NotFound
-from .constants import settings_schema, settings_page, max_wiki_size
-from pmtw.decorators import localdata
 
-"""Represents a single Domain Tag"""
-class domainTag(object):
-	def __init__(self, name, color):
-			self.name  = name
-			self.color = color
-
-	def __repr__(self):
-		return f"domainTag(user='{self.name}', time='{self.color}')"
+from pmtw.constants import MAX_WIKI_SIZE, SETTINGS_PAGE, SETTINGS_VERSION, DEFAULT_IDENTIFIER
 
 
-"""
-Represents the Removal Reasons section.
-Contains removal reasons as reason objects.
-"""
-class removalReason(object):
-	def __init__(self, pmsubject, logreason, header, footer, removalOption, typeReply, typeStickied, typeLockComment, typeAsSub, autoArchive, typeLockThread, logsub, logtitle, bantitle, getfrom, reasons):
-			self.pmsubject       = pmsubject
-			self.logreason       = logreason
-			self.header          = header
-			self.footer          = footer
-			self.removalOption   = removalOption
-			self.typeReply       = typeReply
-			self.typeStickied    = typeStickied
-			self.typeLockComment = typeLockComment
-			self.typeAsSub       = typeAsSub
-			self.autoArchive     = autoArchive
-			self.typeLockThread  = typeLockThread
-			self.logsub          = logsub
-			self.logtitle        = logtitle
-			self.bantitle        = bantitle
-			self.getfrom         = getfrom
-			self.reasons         = reasons
-
-	def __repr__(self):
-		return f"removalReasons()"
-
-"""Represents a single removal reason"""
-class reason(object):
-	def __init__(self, title, text, flairText, flairCSS, removePosts, removeComments):
-		self.text           = text
-		self.flairText      = flairText
-		self.flairCSS       = flairCSS
-		self.title          = title
-		self.removePosts    = removePosts
-		self.removeComments = removeComments
-
-	def __repr__(self):
-		return f"reason(title='{self.title})'"
-
-"""Represents a single mod macro"""
-class modMacro(object):
-	def __init__(self, text, title, distinguish, ban, mute, remove, approve, lockthread, lockreply, sticky, archivemodmail, highlightmodmail, contextpost, contextcomment, contextmodmail):
-			self.text = text
-			self.title = title
-			self.distinguish = distinguish
-			self.ban = ban
-			self.mute = mute
-			self.remove = remove
-			self.approve = approve
-			self.lockthread = lockthread
-			self.lockreply = lockreply
-			self.sticky = sticky
-			self.archivemodmail = archivemodmail
-			self.highlightmodmail = highlightmodmail
-			self.contextpost = contextpost
-			self.contextcomment = contextcomment
-			self.contextmodmail = contextmodmail
-
-	def __repr__(self):
-		return f"modMacro(title='{self.title}')"
+class JSONEncoder(json.JSONEncoder):
+	# overload method default
+	def default(self, obj):
+		if isinstance(obj, ModMacro): return obj.to_dict()
+		elif isinstance(obj, Reason): return obj.to_dict()
+		elif isinstance(obj, RemovalReasons): return obj.to_dict()
+		return obj.__dict__
 
 
-"""Represents a single usernote color"""
-class usernoteColor(object):
-	def __init__(self, key, text, color):
-			self.key   = key
-			self.text  = text
-			self.color = color
+@dataclass
+class BanMacros:
+	banNote: str
+	banMessage: str
 
-	def __repr__(self):
-		return f"usernoteColor(key='{self.key}', text='{self.text}', color='{self.color}')"
-
-
-"""Represents a single ban macro"""
-class banMacro(object):
-	def __init__(self, banNote, banMessage):
-			self.banNote    = banNote
-			self.banMessage = banMessage
-
-	def __repr__(self):
-		return f"banMacro(banNote='{self.banNote}', banMessage='{self.banMessage}')"
-
-"""Represents the Settings page for toolbox, for subreddit settings"""
-class Settings(object):
-	def __init__(self, r, subreddit, fetch=True):
-		self.r = r
-		self.subreddit = subreddit
-		self.settingsJSON = {}
-
-		if fetch:
-			self.__fetch_from_reddit()
+	@staticmethod
+	def from_dict(obj: Any) -> 'BanMacros':
+		_banNote = str(obj.get("banNote"))
+		_banMessage = str(obj.get("banMessage"))
+		return BanMacros(_banNote, _banMessage)
 
 
-	"""Set display for Settings object"""
-	def __repr__(self):
-		return f"ToolboxSettings(subreddit='{self.subreddit}')"
+@dataclass
+class DomainTag:
+	name: str
+	color: str
+
+	@staticmethod
+	def from_dict(obj: Any) -> 'DomainTag':
+		_name = str(obj.get("name"))
+		_color = str(obj.get("color"))
+		return DomainTag(_name, _color)
 
 
-	"""Private method. Some strings are stored encoded in settings"""
-	def __decode_text(self,text):
-		return urllib.parse.unquote(text)
+@dataclass
+class ModMacro:
+	text: str
+	title: str
+	distinguish: bool
+	ban: bool
+	mute: bool
+	remove: bool
+	approve: bool
+	lockthread: bool
+	lockreply: bool
+	sticky: bool
+	archivemodmail: bool
+	highlightmodmail: bool
+	contextpost: bool
+	contextcomment: bool
+	contextmodmail: bool
 
-
-	"""Private method to reencode strings which should be stored encoded"""
-	def __encode_text(self, text):
-		return urllib.parse.quote(text.encode("utf-8"))
-
-
-	"""Private method to fetch toolbox settings"""
-	def __fetch_from_reddit(self):
-		try:
-			settings = self.subreddit.wiki[settings_page].content_md
-			settings = json.loads(settings)
-		except NotFound:
-			raise RuntimeError("Toolbox settings page does not exist")
-		if settings['ver'] != settings_schema:
-			raise RuntimeError(f"Settings Schema mismatch. PMTW requires {settings_schema}, wiki page is {settings['ver']}")
-		else:
-			self.settingsJSON = settings
-		return self.settingsJSON
-
-
-	"""Method to update Toolbox Settings page"""
-	def push_settings(self, reason='Toolbox Settings update from pmtw'):
-		wikipage_data = json.dumps(self.settingsJSON)
-		if len(wikipage_data) > max_wiki_size:
-			raise OverflowError(f'settings data {len(wikipage_data) - max_wiki_size} bytes too big to insert')
-		self.subreddit.wiki[settings_page].edit(wikipage_data, reason)
-		return
-
-
-	def test(self):
-		return self.settingsJSON
-
-	"""
-	Get domain tags as a list. Use get_domainTags(local="False")
-	to fetch from Reddit before retrieval.
-	"""
-	@localdata
-	def get_domainTags(self):
-		domainTags = []
-		try:
-			for item in self.settingsJSON['']:
-				domainTags.append(
-					domainTag(
-						name  = item['name']  if 'name'  in item.keys() else None,
-						color = item['color'] if 'color' in item.keys() else None
-					)
-				)
-		except KeyError: raise KeyError("Section ['domainTags'] does not seem to exist in settings")
-		return domainTags
-
-
-	"""
-	Get Removal Reasons information as a list. Use
-	get_removalReasons(local="False") to fetch from Reddit before returning.
-	"""
-	@localdata
-	def get_removalReasons(self):
-		removalReasons = []
-		try:
-			item = self.settingsJSON['removalReasons']
-			removalReasons = removalReason(
-					pmsubject       = item['pmsubject']                  if 'pmsubject'       in item.keys() else None,
-					logreason       = item['logreason']                  if 'logreason'       in item.keys() else None,
-					header          = self.__decode_text(item['header']) if 'header'          in item.keys() else None,
-					footer          = self.__decode_text(item['footer']) if 'footer'          in item.keys() else None,
-					removalOption   = item['removalOption']              if 'removalOption'   in item.keys() else None,
-					typeReply       = item['typeReply']                  if 'typeReply'       in item.keys() else None,
-					typeStickied    = item['typeStickied']               if 'typeStickied'    in item.keys() else None,
-					typeLockComment = item['typeLockComment']            if 'typeLockComment' in item.keys() else None,
-					typeAsSub       = item['typeAsSub']                  if 'typeAsSub'       in item.keys() else None,
-					autoArchive     = item['autoArchive']                if 'autoArchive'     in item.keys() else None,
-					typeLockThread  = item['typeLockThread']             if 'typeLockThread'  in item.keys() else None,
-					logsub          = item['logsub']                     if 'logsub'          in item.keys() else None,
-					logtitle        = item['logtitle']                   if 'logtitle'        in item.keys() else None,
-					bantitle        = item['bantitle']                   if 'bantitle'        in item.keys() else None,
-					getfrom         = item['getfrom']                    if 'getfrom'         in item.keys() else None,
-					reasons         = self.get_reasons()
-				)
-		except KeyError: raise KeyError("Section ['removalReasons'] does not seem to exist in settings")
-		return removalReasons
-
-
-	"""
-	Returns removal reasons as a list. Use get_reasons(local="False")
-	to fetch reasons from Reddit before returning.
-	"""
-	@localdata
-	def get_reasons(self):
-		reasons = []
-		try:
-			for item in self.settingsJSON['removalReasons']['reasons']:
-				reasons.append(
-					reason(
-						text           = self.__decode_text(item['text']),
-						flairText      = item['flairText']      if 'flairText'      in item.keys() else None,
-						flairCSS       = item['flairCSS']       if 'flairCSS'       in item.keys() else None,
-						removePosts    = item['removePosts']    if 'removePosts'    in item.keys() else None,
-						removeComments = item['removeComments'] if 'removeComments' in item.keys() else None,
-						title          = self.__decode_text(item['title']),
-
-					)
-				)
-		except KeyError: raise KeyError("Section ['removalReasons']['reasons'] does not seem to exist in settings")
-		return reasons
-
-
-	@localdata
-	def add_reason(self, reason):
-		settings = self.settingsJSON
-		new_reason = {
-			'text'           : self.__encode_text(reason.text),
-			'flairText'      : reason.flairText,
-			'flairCSS'       : reason.flairCSS,
-			'removePosts'    : reason.removePosts,
-			'removeComments' : reason.removeComments,
-			'title'          : reason.title
+	def to_dict(ModMacro):
+		d = {
+			"text":urllib.parse.quote(ModMacro.text),
+			"title": ModMacro.title,
+			"distinguish": ModMacro.distinguish,
+			"ban": ModMacro.ban,
+			"mute": ModMacro.mute,
+			"remove": ModMacro.remove,
+			"approve": ModMacro.approve,
+			"lockthread": ModMacro.lockthread,
+			"lockreply": ModMacro.lockreply,
+			"sticky": ModMacro.sticky,
+			"archivemodmail": ModMacro.archivemodmail,
+			"highlightmodmail": ModMacro.highlightmodmail,
+			"contextpost": ModMacro.contextpost,
+			"contextcomment": ModMacro.contextcomment,
+			"contextmodmail": ModMacro.contextmodmail
 		}
-		settings['removalReasons']['reasons'].insert(0, new_reason)
-		self.push_settings(f"\"create new rule '{reason.title}'\" via pmtw")
-		return f"\"create new rule '{reason.title}'\" via pmtw"
+		return d
+
+	@staticmethod
+	def from_dict(obj: Any) -> 'ModMacro':
+		_text = urllib.parse.unquote(str(obj.get("text")))
+		_title = str(obj.get("title"))
+		_distinguish = bool(obj.get("distinguish"))
+		_ban = bool(obj.get("ban"))
+		_mute = bool(obj.get("mute"))
+		_remove = bool(obj.get("remove"))
+		_approve = bool(obj.get("approve"))
+		_lockthread = bool(obj.get("lockthread"))
+		_lockreply = bool(obj.get("lockreply"))
+		_sticky = bool(obj.get("sticky"))
+		_archivemodmail = bool(obj.get("archivemodmail"))
+		_highlightmodmail = bool(obj.get("highlightmodmail"))
+		_contextpost = bool(obj.get("contextpost"))
+		_contextcomment = bool(obj.get("contextcomment"))
+		_contextmodmail = bool(obj.get("contextmodmail"))
+		return ModMacro(_text, _title, _distinguish, _ban, _mute, _remove, _approve, _lockthread, _lockreply, _sticky, _archivemodmail, _highlightmodmail, _contextpost, _contextcomment, _contextmodmail)
 
 
-	"""
-	Returns mod macros as a list. Use get_modMacros(local="False")
-	to fetch reasons from Reddit before returning.
-	"""
-	@localdata
-	def get_modMacros(self):
-		modMacros = []
+@dataclass
+class Reason:
+	text: str
+	flairText: str
+	flairCSS: str
+	removePosts: bool
+	removeComments: bool
+	title: str
+	flairTemplateID: str
+
+	def to_dict(Reason):
+		d = {
+			"text": urllib.parse.quote(Reason.text),
+			"flairText": Reason.flairText,
+			"flairCSS": Reason.flairCSS,
+			"removePosts": Reason.removePosts,
+			"removeComments": Reason.removeComments,
+			"title": Reason.title,
+			"flairTemplateID": Reason.flairTemplateID
+		}
+		return d
+
+	@staticmethod
+	def from_dict(obj: Any) -> 'Reason':
+		_text = urllib.parse.unquote(str(obj.get("text")))
+		_flairText = str(obj.get("flairText"))
+		_flairCSS = str(obj.get("flairCSS"))
+		_removePosts = bool(obj.get("removePosts"))
+		_removeComments = bool(obj.get("removeComments"))
+		_title = str(obj.get("title"))
+		_flairTemplateID = str(obj.get("flairTemplateID"))
+		return Reason(_text, _flairText, _flairCSS, _removePosts, _removeComments, _title, _flairTemplateID)
+
+
+@dataclass
+class RemovalReasons:
+	pmsubject: str
+	logreason: str
+	header: str
+	footer: str
+	removalOption: str
+	typeReply: str
+	typeStickied: bool
+	typeCommentAsSubreddit: bool
+	typeLockComment: bool
+	typeAsSub: bool
+	autoArchive: bool
+	typeLockThread: bool
+	logsub: str
+	logtitle: str
+	bantitle: str
+	getfrom: str
+	reasons: List[Reason]
+
+	def to_dict(RemovalReasons):
+		d = {
+		"pmsubject": urllib.parse.quote(RemovalReasons.pmsubject),
+		"logreason": urllib.parse.quote(RemovalReasons.logreason),
+		"header": urllib.parse.quote(RemovalReasons.header),
+		"footer": urllib.parse.quote(RemovalReasons.footer),
+		"removalOption": RemovalReasons.removalOption,
+		"typeReply": RemovalReasons.typeReply,
+		"typeStickied": RemovalReasons.typeStickied,
+		"typeCommentAsSubreddit": RemovalReasons.typeCommentAsSubreddit,
+		"typeLockComment": RemovalReasons.typeLockComment,
+		"typeAsSub": RemovalReasons.typeAsSub,
+		"autoArchive": RemovalReasons.autoArchive,
+		"typeLockThread": RemovalReasons.typeLockThread,
+		"logsub": urllib.parse.quote(RemovalReasons.logsub),
+		"logtitle":RemovalReasons.logtitle,
+		"bantitle": urllib.parse.quote(RemovalReasons.bantitle),
+		"getfrom": RemovalReasons.getfrom,
+		"reasons":[Reason.to_dict(r) for r in RemovalReasons.reasons]
+		}
+		return d
+
+	@staticmethod
+	def from_dict(obj: Any) -> 'RemovalReasons':
+		_pmsubject = urllib.parse.unquote(str(obj.get("pmsubject")))
+		_logreason = urllib.parse.unquote(str(obj.get("logreason")))
+		_header = urllib.parse.unquote(str(obj.get("header")))
+		_footer = urllib.parse.unquote(str(obj.get("footer")))
+		_removalOption = str(obj.get("removalOption"))
+		_typeReply = str(obj.get("typeReply"))
+		_typeStickied = bool(obj.get("typeStickied"))
+		_typeCommentAsSubreddit = bool(obj.get("typeCommentAsSubreddit"))
+		_typeLockComment = bool(obj.get("typeLockComment"))
+		_typeAsSub = bool(obj.get("typeAsSub"))
+		_autoArchive = bool(obj.get("autoArchive"))
+		_typeLockThread = bool(obj.get("typeLockThread"))
+		_logsub = urllib.parse.unquote(str(obj.get("logsub")))
+		_logtitle = str(obj.get("logtitle"))
+		_bantitle = urllib.parse.unquote(str(obj.get("bantitle")))
+		_getfrom = str(obj.get("getfrom"))
+		_reasons = [Reason.from_dict(y) for y in obj.get("reasons")]
+		return RemovalReasons(_pmsubject, _logreason, _header, _footer, _removalOption, _typeReply, _typeStickied, _typeCommentAsSubreddit, _typeLockComment, _typeAsSub, _autoArchive, _typeLockThread, _logsub, _logtitle, _bantitle, _getfrom, _reasons)
+
+
+@dataclass
+class UsernoteColor:
+	key: str
+	text: str
+	color: str
+
+	@staticmethod
+	def from_dict(obj: Any) -> 'UsernoteColor':
+		_key = str(obj.get("key"))
+		_text = str(obj.get("text"))
+		_color = str(obj.get("color"))
+		return UsernoteColor(_key, _text, _color)
+
+
+@dataclass
+class SettingsRoot:
+	ver: int
+	domainTags: List[DomainTag]
+	removalReasons: RemovalReasons
+	modMacros: List[ModMacro]
+	usernoteColors: List[UsernoteColor]
+	banMacros: BanMacros
+
+	def __repr__(self):
+		return f"SettingsRoot(ver='{self.ver}')"
+
+	def __str__(self):
+		return self.to_json()
+
+	def to_json(self):
+		return json.dumps(self.__dict__, cls=JSONEncoder)
+
+	@staticmethod
+	def from_dict(obj: Any) -> 'SettingsRoot':
+		_ver = int(obj.get("ver"))
+		_domainTags = [DomainTag.from_dict(y) for y in obj.get("domainTags")]
+		_removalReasons = RemovalReasons.from_dict(obj.get("removalReasons"))
+		_modMacros = [ModMacro.from_dict(y) for y in obj.get("modMacros")]
+		_usernoteColors = [UsernoteColor.from_dict(y) for y in obj.get("usernoteColors")]
+		_banMacros = BanMacros.from_dict(obj.get("banMacros"))
+		return SettingsRoot(_ver, _domainTags, _removalReasons, _modMacros, _usernoteColors, _banMacros)
+
+
+class ToolboxSettings:
+	"""Represents the Toolbox Settings page."""
+	def __init__(self, subreddit, identifier=DEFAULT_IDENTIFIER, lazy=False):
+		"""
+		Construtor for the ToolboxSettings class.
+
+		Parameters
+		----------
+		subreddit: praw.subreddit object
+			the subreddit to use the Toolbox object with
+		lazy: Bool
+			if set to True, does not fetch from Reddit on instantiation
+		identifier: String
+			string that get's appended to all wikiedit discriptions identifying
+			pmtw as the actioner. Defaults to "via pmtw"
+		"""
+		
+		self.__subreddit = subreddit
+		self.identifier = identifier
+		self.__settings = ""
+		self.ver = ""
+		self.domainTags = ""
+		self.removalReasons = ""
+		self.modMacros = ""
+		self.usernoteColors = ""
+		self.banMacros = ""
+		self.warnings = ""
+
+		if not lazy: self.load()
+
+	def __repr__(self):
+		"""Set display for a ToolboxSettings object"""
+		return f"ToolboxSettings(subreddit='{self.__subreddit}')"
+
+	def load(self):
+		"""
+		Load Toolbox Settings from Reddit
+
+		Returns
+		-------
+		String
+			Information letting the user know settings are loaded
+		"""
+
 		try:
-			for item in self.settingsJSON['modMacros']:
-				modMacros.append(
-					modMacro(
-						text             = self.__decode_text(item['text'])  if 'text'             in item.keys() else None,
-						title            = self.__decode_text(item['title']) if 'title'            in item.keys() else None,
-						distinguish      = item['distinguish']               if 'distinguish'      in item.keys() else None,
-						ban              = item['ban']                       if 'ban'              in item.keys() else None,
-						mute             = item['mute']                      if 'mute'             in item.keys() else None,
-						remove           = item['remove']                    if 'remove'           in item.keys() else None,
-						approve          = item['approve']                   if 'approve'          in item.keys() else None,
-						lockthread       = item['lockthread']                if 'lockthread'       in item.keys() else None,
-						lockreply        = item['lockreply']                 if 'lockreply'        in item.keys() else None,
-						sticky           = item['sticky']                    if 'sticky'           in item.keys() else None,
-						archivemodmail   = item['archivemodmail']            if 'archivemodmail'   in item.keys() else None,
-						highlightmodmail = item['highlightmodmail']          if 'highlightmodmail' in item.keys() else None,
-						contextpost      = item['contextpost']               if 'contextpost'      in item.keys() else None,
-						contextcomment   = item['contextcomment']            if 'contextcomment'   in item.keys() else None,
-						contextmodmail   = item['contextmodmail']            if 'contextmodmail'   in item.keys() else None
-					)
-				)
-		except KeyError: raise KeyError("Section ['modMacros'] does not seem to exist in settings")
-		return modMacros
+			page = self.__subreddit.wiki[SETTINGS_PAGE].content_md
+			page = json.loads(page)
+			if page["ver"] != 1: raise ValueError(f"pmtw requires settings ver {SETTINGS_VERSION}, got {page['ver']}")
+		except NotFound:
+			initialJSON = {"ver":1,"domainTags":"","removalReasons":{"pmsubject":"","logreason":"","header":"test","footer":"","removalOption":"suggest","typeReply":"reply","typeStickied":False,"typeCommentAsSubreddit":False,"typeLockComment":False,"typeAsSub":False,"autoArchive":False,"typeLockThread":False,"logsub":"","logtitle":"","bantitle":"","getfrom":"","reasons":[]},"modMacros":[],"usernoteColors":[{"key":"gooduser","text":"Good Contributor","color":"#008000"},{"key":"spamwatch","text":"Spam Watch","color":"#ff00ff"},{"key":"spamwarn","text":"Spam Warning","color":"#800080"},{"key":"abusewarn","text":"Abuse Warning","color":"#ffa500"},{"key":"ban","text":"Ban","color":"#ff0000"},{"key":"permban","text":"Permanent Ban","color":"#8b0000"},{"key":"botban","text":"Bot Ban","color":"#000000"}],"banMacros":{"banNote":"","banMessage":""}}
+			page = self.__subreddit.wiki.create(name=SETTINGS_PAGE, content=str(initialJSON))
+			self.__subreddit.wiki[SETTINGS_PAGE].mod.update(listed=False, permlevel=2)
 
+		# append expected items to the json, in case the toolbox settings 
+		# don't have them, since things get added here without a bump to ver
+		for item in ["domainTags", "removalReasons", "modMacros","banMacros"]:
+			if item not in page.keys(): page[item] = ""
 
-	"""
-	Returns usernote colors as a list. Use get_usernoteColors(local="False")
-	to fetch reasons from Reddit before returning.
-	"""
-	@localdata
-	def get_usernoteColors(self):
-		usernote_colors = []
-		try:
-			for item in self.settingsJSON['usernoteColors']:
-				usernote_colors.append(
-					usernoteColor(
-						key   = item['key']   if 'key'   in item.keys() else None,
-						text  = item['text']  if 'text'  in item.keys() else None,
-						color = item['color'] if 'color' in item.keys() else None
-					)
-				)
-			return usernote_colors
-		except KeyError: raise KeyError("Section ['usernoteColors'] does not seem to exist in settings")
+		# Copy things over so we don't have to hit ToolboxSettings.settings
+		# for every variable
+		self.__settings = SettingsRoot.from_dict(page)
+		self.ver = self.__settings.ver
+		self.domainTags = self.__settings.domainTags
+		self.removalReasons = self.__settings.removalReasons
+		self.modMacros = self.__settings.modMacros
+		self.usernoteColors = self.__settings.usernoteColors
+		self.banMacros = self.__settings.banMacros
 
+		warnings = []
+		for color in self.usernoteColors:
+			warnings.append(color.key)
+		self.warnings = warnings
 
-	"""
-	Returns usernote colors as a list. Use get_banMacros(local="False")
-	to fetch reasons from Reddit before returning.
-	"""
-	@localdata
-	def get_banMacros(self):
-		banMacros = []
-		try:
-			for item in self.settingsJSON['']:
-				banMacros.append(
-					banMacro(
-						banNote    = item['banNote']    if 'banNote'    in item.keys() else None,
-						banMessage = item['banMessage'] if 'banMessage' in item.keys() else None
-					)
-				)
-		except KeyError: raise KeyError("Section ['banMacros'] does not seem to exist in settings")
-		return banMacros
+		return "Settings loaded"
 
+	def save(self, reason="Settings update"):
+		"""
+		Save Toolbox settings back to Reddit
 
+		Parameters
+		----------
+		reason: String
+			Optional, set a custom reason for the wiki page description
+
+		Returns
+		-------
+		String
+			Reason with identifier set when instantiating a Toolbox object
+
+		Raises
+		------
+		OverflowError
+			If the settings page is too big to save to Reddit
+
+		"""
+		reason = f"{reason} {self.identifier}"
+
+		# Copy the class variables back to the dataclasses for compression
+		self.__settings.ver = self.ver
+		self.__settings.domainTags = self.domainTags
+		self.__settings.removalReasons = self.removalReasons
+		self.__settings.modMacros = self.modMacros
+		self.__settings.usernoteColors = self.usernoteColors
+		self.__settings.banMacros = self.banMacros
+
+		if len(self.__settings.__str__()) > MAX_WIKI_SIZE:
+			raise OverflowError(f'Usernote data {len(self.__settings.__str__()) - MAX_WIKI_SIZE} bytes too big to insert')
+		self.__subreddit.wiki[SETTINGS_PAGE].edit(content=self.__settings.__str__(),reason=reason)
+		return reason
