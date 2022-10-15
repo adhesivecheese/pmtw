@@ -13,7 +13,6 @@ PMTW's documentation is organized into the following sections:
 
 * [Getting Started](#getting-started)
 * [Code Overview](#code-overview)
-* [Tutorials](#tutorials)
 * [Package Info](#package-info)
 * [Toolbox Schema Information](#toolbox-schema-information)
 
