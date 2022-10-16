@@ -1,3 +1,5 @@
 .pmtw
 dist/
+pmtw.egg-info/praw.ini
+praw.ini
 pmtw.egg-info/

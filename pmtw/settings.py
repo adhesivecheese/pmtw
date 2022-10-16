@@ -6,7 +6,7 @@ from typing import Any, List
 from prawcore.exceptions import NotFound
 
 from pmtw.constants import MAX_WIKI_SIZE, SETTINGS_PAGE, SETTINGS_VERSION, DEFAULT_IDENTIFIER
-
+from pmtw.stream import revisions_stream
 
 class JSONEncoder(json.JSONEncoder):
 	# overload method default
@@ -349,3 +349,35 @@ class ToolboxSettings:
 			raise OverflowError(f'Usernote data {len(self.__settings.__str__()) - MAX_WIKI_SIZE} bytes too big to insert')
 		self.__subreddit.wiki[SETTINGS_PAGE].edit(content=self.__settings.__str__(),reason=reason)
 		return reason
+
+	def stream(self, pause_after=None, skip_existing=False):
+		"""
+		Yields new WikiRevision objects as they become available
+
+		Parameters
+		----------
+		pause_after: [Optional] Integer (Default: `None`)
+			An integer representing the number of requests that result in no new 
+			items before this function yields `None`, effectively introducing a 
+			pause into the stream. A negative value yields `None` after items 
+			from a single response have been yielded, regardless of number of new 
+			items obtained in that response. A value of `0` yields `None` after 
+			every response resulting in no new items, and a value of `None` never 
+			introduces a pause.
+		skip_existing: [Optional] Boolean (Default: False)
+			When `True`, this does not yield any results from the first request 
+			thereby skipping any items that existed in the stream prior to starting 
+			the stream.
+
+		Yields
+		------
+		WikiRevision objects
+		
+		"""
+		for revision in revisions_stream(
+			sub=self.__subreddit,
+			page=SETTINGS_PAGE,
+			pause_after = pause_after,
+			skip_existing = skip_existing
+		):
+			yield revision

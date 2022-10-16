@@ -10,6 +10,7 @@ from prawcore.exceptions import NotFound
 
 from pmtw.constants import (DEFAULT_IDENTIFIER, MAX_WIKI_SIZE, USERNOTES_PAGE,
                             USERNOTES_VERSION)
+from pmtw.stream import revisions_stream
 
 
 class ToolboxNote:
@@ -281,7 +282,7 @@ class ToolboxUsernotes:
 			search_user = username
 		return search_user
 
-	def _save(self, reason='Usernote update'):
+	def save(self, reason='Usernote update'):
 		"""
 		Save usernotes to Reddit, with whatever reason is specified. Will raise 
 		an OverflowError if the current data is too big for the wiki page.
@@ -380,12 +381,12 @@ class ToolboxUsernotes:
 		try:
 			self.__usernotesJSON['users'][user]['ns'].insert(0, new_note)
 			if lazy == False:
-				self._save(f"create new note on user '{user}'")
+				self.save(f"create new note on user '{user}'")
 				return f"create new note on user '{user}'"
 		except KeyError:
 			self.__usernotesJSON['users'][user] = {'ns': [new_note]}
 			if lazy == False:
-				self._save(f"create new note on user '{user}'")
+				self.save(f"create new note on user '{user}'")
 				return f"create new note on user '{user}'"
 
 	def remove(self, user, timestamp=-1, lazy=False):
@@ -421,7 +422,7 @@ class ToolboxUsernotes:
 
 		if timestamp == -1:
 			del self.__usernotesJSON['users'][user]
-			if lazy == False: self._save(f"Deleted all notes on {user}")
+			if lazy == False: self.save(f"Deleted all notes on {user}")
 			return f"Deleted all notes on {user}"
 		else:
 			notes_on_user = self.__usernotesJSON['users'][user]['ns']
@@ -435,16 +436,15 @@ class ToolboxUsernotes:
 			# Delete the user from the database if there are no notes left
 			if len(notes_on_user) == 0:
 				del self.__usernotesJSON['users'][user]
-				if lazy == False: self._save(f"delete all notes on user '{user}'")
+				if lazy == False: self.save(f"delete all notes on user '{user}'")
 				return f"delete all notes on user '{user}'"
 			else:
-				if lazy == False: self._save(f"delete note {timestamp} on user '{user}'")
+				if lazy == False: self.save(f"delete note {timestamp} on user '{user}'")
 				return f"delete note {timestamp} on user '{user}'"
 
 	def list_users(self, lazy=True):
 		"""
-		Returns a list of all users with notes. If fresh is set to True, will 
-		re-load notes from Reddit before listing.
+		Returns a list of all users with notes.
 
 		Parameters
 		----------
@@ -526,3 +526,35 @@ class ToolboxUsernotes:
 			for note in self.list_notes(user):
 				notes.append(note)
 		return sorted(notes, key = lambda x: x.time, reverse=reverse)
+
+	def stream(self, pause_after=None, skip_existing=False):
+		"""
+		Yields new WikiRevision objects as they become available
+
+		Parameters
+		----------
+		pause_after: [Optional] Integer (Default: `None`)
+			An integer representing the number of requests that result in no new 
+			items before this function yields `None`, effectively introducing a 
+			pause into the stream. A negative value yields `None` after items 
+			from a single response have been yielded, regardless of number of new 
+			items obtained in that response. A value of `0` yields `None` after 
+			every response resulting in no new items, and a value of `None` never 
+			introduces a pause.
+		skip_existing: [Optional] Boolean (Default: False)
+			When `True`, this does not yield any results from the first request 
+			thereby skipping any items that existed in the stream prior to starting 
+			the stream.
+
+		Yields
+		------
+		WikiRevision objects
+		
+		"""
+		for revision in revisions_stream(
+			sub=self.__subreddit,
+			page=USERNOTES_PAGE,
+			pause_after = pause_after,
+			skip_existing = skip_existing
+		):
+			yield revision

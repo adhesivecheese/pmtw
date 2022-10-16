@@ -51,7 +51,7 @@ ToolboxSettings instance.
 
 ## Class Public Methods
 
-### _save
+### save
 
 !!! note "method definition"
 	```
@@ -140,6 +140,25 @@ before listing.
 If the keyword argument `reverse` is set to True, the returned list will be in 
 reverse-chronological order.
 
+### stream
+!!! note "method definition"
+	```
+	stream([Optional] pause_after:int, [Optional] skip_existing:bool)
+	```
+
+Yields new [WikiRevision] objects for the usernotes page.
+
+pause_after
+: An integer representing the number of requests that result in no new items 
+before this function yields `None`, effectively introducing a pause into the 
+stream. A negative value yields `None` after items from a single response have 
+been yielded, regardless of number of new items obtained in that response. A 
+value of `0` yields `None` after every response resulting in no new items, and 
+a value of `None` never introduces a pause.
+
+skip_existing
+: When `True`, this does not yield any results from the first request thereby 
+skipping any items that existed in the stream prior to starting the stream.
 
 ## Class Private Methods
 
