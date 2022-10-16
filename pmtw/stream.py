@@ -2,6 +2,7 @@ import time
 from typing import Any, Generator, Optional
 from praw.models.util import BoundedSet, ExponentialCounter
 from praw.models import ListingGenerator
+from datetime import datetime
 
 class WikiRevision:
 	def __init__(self, user, timestamp, page, revision_hidden, reason, id):
@@ -11,9 +12,11 @@ class WikiRevision:
 		self.revision_hidden = revision_hidden
 		self.reason = reason
 		self.id = id
+		
+		self.human_time = datetime.fromtimestamp(self.timestamp).__str__()
 
 	def __repr__(self):
-		return f"WikiRevision(page='{self.page}' user='{self.user}' timestamp='{self.timestamp}')"
+		return f"WikiRevision(page='{self.page}' user='{self.user}' human_time='{self.human_time}')"
 
 def revisions_stream(
 	sub=None,
