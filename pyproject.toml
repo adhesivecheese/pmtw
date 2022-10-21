@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pmtw"
-version = "1.1.1"
+version = "1.1.2"
 description = "PMTW allows for simple access to Reddit Moderator Toolbox"
 readme = "README.md"
 authors = [{ name = "adhesiveCheese", email = "adhesiveCheese@gmail.com" }]
