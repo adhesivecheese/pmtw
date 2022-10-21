@@ -456,7 +456,7 @@ class ToolboxUsernotes:
 		List
 			list of strings of every user with usernotes
 		"""
-		if lazy == True: self.load()
+		if lazy == False: self.load()
 		return list(self.__usernotesJSON['users'].keys())
 
 	def list_notes(self, user, lazy=True, reverse=False):
@@ -483,7 +483,7 @@ class ToolboxUsernotes:
 			if user doesn't exist in usernotes
 
 		"""	
-		if lazy == True: self.load()
+		if lazy == False: self.load()
 		user = str(user) #in case a praw user object is passed
 
 		user = self.__match_username(user)
@@ -520,7 +520,7 @@ class ToolboxUsernotes:
 		List
 			list containing ToolboxUsernotes
 		"""	
-		if lazy == True: self.load()
+		if lazy == False: self.load()
 		notes = []
 		for user in self.list_users():
 			for note in self.list_notes(user):
