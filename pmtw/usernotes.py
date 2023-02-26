@@ -77,7 +77,8 @@ class ToolboxNote:
 			an expanded link
 
 		"""
-		if link == '': return None #if no link, nothing to do
+		if not link: return None #if no link, nothing to do
+		if link == '': return None #if blank link, nothing to do
 		parts = link.split(',') # 'l,abcde,fghij' format for comments, 'l,kmlno' for links
 		if parts[0] == "m": return f'https://reddit.com/message/messages/{parts[1]}'
 		if len(parts) > 2: return f'https://reddit.com/comments/{parts[1]}/-/{parts[2]}'
