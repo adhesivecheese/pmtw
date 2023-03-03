@@ -1,4 +1,4 @@
-__version__ = "1.0.0"
+__version__ = "1.1.3"
 SETTINGS_VERSION = 1
 USERNOTES_VERSION = 6
 USERNOTES_PAGE = "usernotes"
