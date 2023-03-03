@@ -296,7 +296,7 @@ class ToolboxSettings:
 		# append expected items to the json, in case the toolbox settings 
 		# don't have them, since things get added here without a bump to ver
 		for item in ["domainTags", "removalReasons", "modMacros","banMacros"]:
-			if item not in page.keys(): page[item] = ""
+			if item not in page.keys(): page[item] = []
 
 		# Copy things over so we don't have to hit ToolboxSettings.settings
 		# for every variable
